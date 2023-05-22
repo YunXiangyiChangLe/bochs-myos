@@ -1,0 +1,3 @@
+;加载器的配置信息
+LOADER_BASE_ADDR equ 0x900;loader在内存中的位置
+LOADER_START_SECTOR equ 0x02;loader在硬盘上的逻辑地址
