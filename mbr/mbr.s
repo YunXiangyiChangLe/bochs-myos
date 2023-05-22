@@ -60,6 +60,7 @@ rd_disk_m_16:
     mov dx,0x1f2
     mov al,cl
     out dx,al
+    mov eax,esi
 
 ;第二步把LBA地址存入0x1f3,0x1f4,0x1f5
     mov dx,0x1f3
