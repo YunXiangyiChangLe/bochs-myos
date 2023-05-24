@@ -1,28 +1,63 @@
 %include "boot.inc"
 
 SECTION LOADER vstart=LOADER_BASE_ADDR
-    mov byte [gs:0x00],'2'
-    mov byte [gs:0x01],0xA4
+LOAD_STACK_TOP equ LOADER_BASE_ADDR
 
-    mov byte [gs:0x02],' '
-    mov byte [gs:0x03],0xA4
+    jmp loader_start 
 
-    mov byte [gs:0x04],'L'
-    mov byte [gs:0x05],0xA4
+    GDT_BASE: dd 0x00000000
+                dd 0x00000000
+    CODE_DESC: dd 0x0000ffff
+                dd DESC_CODE_HIGH4
+    DATA_DESC: dd 0x0000ffff
+                dd DESC_DATA_HIGH4
+    VIDEO_DESC: dd 0x80000007
+                dd DESC_VIDEO_HIGH4
+    GDT_SIZE equ $-GDT_BASE
+    GDT_LIMIT equ GDT_SIZE
+    times 60 dq 0
 
-    mov byte [gs:0x06],'O'
-    mov byte [gs:0x07],0xA4
+    SECTEROR_CODE equ (0x1<<3)+TI_GDT+RPL0
+    SECRETOR_DATA equ (0x2<<3)+TI_GDT+RPL0
+    SECTEROR_VIDIO equ (0x3<<3)+TI_GDT+RPL0
 
-    mov byte [gs:0x08],'A'
-    mov byte [gs:0x09],0xA4
+    gdt_ptr dw GDT_LIMIT
+                dd GDT_BASE
+    loadermsg db '2 loader in real'
 
-    mov byte [gs:0x0a],'D'
-    mov byte [gs:0x0b],0xA4
+    loader_start:
+    mov sp,LOADER_BASE_ADDR
+    mov bp,loadermsg
+    mov cx,17
+    mov ax,0x1301
+    mov bx,0x001f
+    mov dx,0x1800
+    int 0x10
 
-    mov byte [gs:0x0c],'E'
-    mov byte [gs:0x0d],0xA4
 
-    mov byte [gs:0x0e],'R'
-    mov byte [gs:0x0f],0xA4
+;------进入保护模式--------
+    in al,0x92
+    or al,00000010b
+    out 0x92,al 
 
-jmp $
+    lgdt [gdt_ptr]
+
+    mov eax,cr0
+    or eax,0x00000001
+    mov cr0,eax
+
+    jmp dword SECTEROR_CODE:p_mode_start
+
+[bits 32]
+    p_mode_start:
+    mov ax,SECRETOR_DATA
+    mov ds,ax
+    mov es,ax
+    mov ss,ax
+    mov esp,LOAD_STACK_TOP
+    mov ax,SECTEROR_VIDIO
+    mov gs,ax
+
+    mov byte [gs:160],'P'
+
+    jmp $

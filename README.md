@@ -6,7 +6,7 @@ bochs.disk是配置文件
 
 #nasm -o mbr.bin mbr.s
 
-nasm -I mbr/include/ -o mbr.bin mbr/mbr.s
+nasm -I boot/include/ -o mbr.bin boot/mbr.s
 
 dd if=mbr.bin of=bin/hd60M.img bs=512 count=1 conv=notrunc
 
@@ -14,6 +14,6 @@ bin/bochs -f bochsrc.disk
 
 
 
-nasm -I mbr/include/ -o loader.bin mbr/loader.s
+nasm -I boot/include/ -o loader.bin boot/loader.s
 
-dd if=loader.bin of=bin/hd60M.img bs=512 count=1 seek=2 conv=notrunc
+dd if=loader.bin of=bin/hd60M.img bs=512 count=2 seek=2 conv=notrunc
