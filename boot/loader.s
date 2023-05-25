@@ -60,4 +60,20 @@ LOAD_STACK_TOP equ LOADER_BASE_ADDR
 
     mov byte [gs:160],'P'
 
-    jmp $
+;    jmp $
+
+
+
+
+;---------创建页目录和页表-----------
+setup_page:
+    ;先清空页目录中的字节，因为内存中可能会出现一些随机字节
+    mov ecx,4096
+    mov esi,0
+.clear_page_dir:
+    mov byte [PAGE_DIR_TABLE_POS+esi],0
+    inc esi
+    loop .clear_page_dir
+
+    ;创建页目录项(PDE)
+    
