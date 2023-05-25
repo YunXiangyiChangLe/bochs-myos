@@ -1,6 +1,7 @@
 ;加载器的配置信息
 LOADER_BASE_ADDR equ 0x900;loader在内存中的位置
 LOADER_START_SECTOR equ 0x02;loader在硬盘上的逻辑地址
+PAGE_DIR_TABLE_POS equ 0x100000;页目录表的物理地址
 
 
 ;---------gdt段描述符的属性-------------
@@ -35,3 +36,11 @@ RPL2 equ    10b
 RPL3 equ    11b
 TI_GDT equ  0_00b
 TI_LDT equ  1_00b
+
+
+;----------页表相关属性-----------
+PG_P equ 1b
+PG_RW_R equ 0_0b
+PG_RW_W equ 1_0b
+PG_US_S equ 0_00b
+PG_US_U equ 1_00b
