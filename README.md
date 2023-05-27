@@ -16,4 +16,4 @@ bin/bochs -f bochsrc.disk
 
 nasm -I boot/include/ -o loader.bin boot/loader.s
 
-dd if=loader.bin of=bin/hd60M.img bs=512 count=2 seek=2 conv=notrunc
+dd if=loader.bin of=bin/hd60M.img bs=512 count=3 seek=2 conv=notrunc

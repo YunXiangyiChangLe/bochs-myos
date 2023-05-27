@@ -9,12 +9,12 @@ LOAD_STACK_TOP equ LOADER_BASE_ADDR
                 dd 0x00000000
     CODE_DESC: dd 0x0000ffff
                 dd DESC_CODE_HIGH4
-    DATA_DESC: dd 0x0000ffff
+    DATA_STACK_DESC: dd 0x0000ffff
                 dd DESC_DATA_HIGH4
     VIDEO_DESC: dd 0x80000007
                 dd DESC_VIDEO_HIGH4
     GDT_SIZE equ $-GDT_BASE
-    GDT_LIMIT equ GDT_SIZE
+    GDT_LIMIT equ GDT_SIZE-1
     times 60 dq 0
 
     SECTEROR_CODE equ (0x1<<3)+TI_GDT+RPL0
@@ -23,7 +23,7 @@ LOAD_STACK_TOP equ LOADER_BASE_ADDR
 
     gdt_ptr dw GDT_LIMIT
                 dd GDT_BASE
-    loadermsg db '2 loader in real'
+    loadermsg db '2 loader in real.'
 
     loader_start:
     mov sp,LOADER_BASE_ADDR
@@ -58,7 +58,27 @@ LOAD_STACK_TOP equ LOADER_BASE_ADDR
     mov ax,SECTEROR_VIDIO
     mov gs,ax
 
-    mov byte [gs:160],'P'
+    ;创建页目录及页表并初始化页内存图
+    call setup_page
+    sgdt [gdt_ptr]
+    mov ebx,[gdt_ptr+2]
+    or dword [ebx+0x18+4],0xc0000000
+    add dword [gdt_ptr+2],0xc0000000
+    add esp,0xc0000000
+
+    mov eax,PAGE_DIR_TABLE_POS
+    mov cr3,eax
+
+    mov eax,cr0
+    or eax,0x80000000
+    mov cr0,eax
+
+    lgdt [gdt_ptr]
+
+    mov byte [gs:160],'V'
+    jmp $
+
+;    mov byte [gs:160],'P'
 
 ;    jmp $
 
@@ -76,4 +96,37 @@ setup_page:
     loop .clear_page_dir
 
     ;创建页目录项(PDE)
-    
+.creat_pde:
+    mov eax,PAGE_DIR_TABLE_POS
+    add eax,0x1000
+    mov ebx,eax;第一个页表的位置
+
+    or eax,PG_US_U|PG_RW_W|PG_P
+    mov [PAGE_DIR_TABLE_POS+0x0],eax
+    mov [PAGE_DIR_TABLE_POS+0xc00],eax
+    sub eax,0x1000
+    mov [PAGE_DIR_TABLE_POS+4092],eax
+
+    ;创建页表项(PTE)
+    mov ecx,256
+    mov esi,0
+    mov edx,PG_US_U|PG_RW_W|PG_P
+.creat_pte:
+    mov [ebx+esi*4],edx
+    add edx,4096
+    inc esi
+    loop .creat_pte
+
+    ;创建内核其他页表的PDE
+    mov eax,PAGE_DIR_TABLE_POS
+    add eax,0x2000
+    or eax,PG_US_U|PG_RW_W|PG_P
+    mov ebx,PAGE_DIR_TABLE_POS
+    mov ecx,254
+    mov esi,769
+.creat_lernel_pde:
+    mov [ebx+esi*4],eax
+    inc esi
+    add eax,0x1000
+    loop .creat_lernel_pde
+    ret
