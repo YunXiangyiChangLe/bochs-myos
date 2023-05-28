@@ -3,6 +3,12 @@ LOADER_BASE_ADDR equ 0x900;loader在内存中的位置
 LOADER_START_SECTOR equ 0x02;loader在硬盘上的逻辑地址
 PAGE_DIR_TABLE_POS equ 0x100000;页目录表的物理地址
 
+;---------内核-----------
+KERNEL_START_SECTOR equ 0x9
+KERNEL_BIN_BASE_ADDR equ 0x70000
+PT_NULL equ 0
+KERNEL_ENTER_POINT equ 0x1500
+
 
 ;---------gdt段描述符的属性-------------
 DESC_G_4K equ     1_00000000000000000000000b
