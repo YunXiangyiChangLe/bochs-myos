@@ -2,3 +2,5 @@ bochs.out
 mbr.bin
 bin/hd60M.img
 loader.bin
+test/head.bin
+kernel/kernel.bin
