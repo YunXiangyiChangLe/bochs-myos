@@ -4,3 +4,5 @@ bin/hd60M.img
 loader.bin
 test/head.bin
 kernel/kernel.bin
+test/syscall_write.o
+test/syscall_write.bin
