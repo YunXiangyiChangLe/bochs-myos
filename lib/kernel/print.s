@@ -25,7 +25,7 @@ put_char:
     mov dx,0x03d5
     in al,dx
     ;光标存入dx
-    mov dx,ax
+    mov bx,ax
     mov ecx,[esp+36]
     cmp cl,0xd;回车CR是0xd，换行LF是0xa，backspace（BS）是0x8
     jz .is_carriage_return
@@ -63,7 +63,7 @@ put_char:
 .is_carriage_return_end:
     add bx,80
     cmp bx,2000
-.is_line_feed:
+.is_line_feed_end:
     jl .set_cursor
 
 ;滚屏第一步先把1到24行搬运到0到23行
