@@ -8,3 +8,4 @@ test/syscall_write.o
 test/syscall_write.bin
 lib/kernel/print.o
 kernel/main.o
+test/inlineASM.bin
