@@ -3,6 +3,30 @@
 
 [bits 32]
 section .text
+
+;打印字符串
+global put_str
+put_str:
+    push ebx
+    push ecx
+    xor ecx,ecx
+    mov ebx,[esp+12]
+.goon 
+    mov cl,[ebx]
+    cmp cl,0
+    jz .str_over
+    push ecx
+    call put_char
+    pop ecx
+    inc ebx
+    jmp .goon
+.str_over
+    pop ecx
+    pop ebx
+    ret
+
+
+;打印单个字符
 global put_char
 put_char:
     ;备份32位环境
